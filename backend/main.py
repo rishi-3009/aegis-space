@@ -25,23 +25,7 @@ SAMPLES_DIR = os.path.join(ROOT, "contracts", "sample")
 BENCHMARK_PATH = os.path.join(ROOT, "ml", "benchmark.json")
 MAX_TRACKED = 200
 
-try:
-    from tools.report import generate_report
-except Exception as err:  # tools/report.py currently has a syntax error on main
-    print(f"tools.report unavailable, using fallback report: {err}")
-
-    def generate_report(conjunction):
-        return (
-            f"COLLISION RISK ALERT ({conjunction['risk_level']})\n"
-            f"Event: {conjunction['id']}\n"
-            f"Primary satellite : {conjunction['primary']['name']}\n"
-            f"Other object      : {conjunction['secondary']['name']}\n"
-            f"Closest approach  : {conjunction['tca']}\n"
-            f"Miss distance     : {conjunction['miss_distance_km']} km\n"
-            f"Relative speed    : {conjunction['relative_speed_kms']} km/s\n"
-            f"Collision chance  : {conjunction['pc']:.2e}\n"
-            "\nASSUMPTIONS: Position uncertainty 0.5 km, combined object size 20 m."
-        )
+from tools.report import generate_report  # noqa: E402
 
 STATE = {}
 
@@ -163,7 +147,8 @@ def get_ml_benchmark():
 
 @app.get("/api/report/{conjunction_id}")
 def get_report(conjunction_id: str):
+    conj = _find(conjunction_id)
     return {
         "conjunction_id": conjunction_id,
-        "text": generate_report(_public(_find(conjunction_id))),
+        "text": generate_report(_public(conj), recommend_burn(conj)),
     }
