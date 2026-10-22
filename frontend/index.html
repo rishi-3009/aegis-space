@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.js" } }
+  </script>
+</head>
+<body>
+  <header class="title-bar">
+    <h1>AEGIS</h1>
+    <span id="status" class="status"></span>
+  </header>
+
+  <main class="layout">
+    <div class="left">
+      <section class="panel globe-panel">
+        <div id="globe"></div>
+      </section>
+      <div class="bottom-row">
+        <section class="panel time-bar">
+          <div class="time-controls">
+            <button id="play" class="btn">Pause</button>
+            <button class="btn speed" data-speed="1">1x</button>
+            <button class="btn speed" data-speed="60">60x</button>
+            <button class="btn speed" data-speed="600">600x</button>
+            <input id="scrubber" type="range" min="0" max="86340" step="1" value="0">
+            <span id="clock" class="clock">--</span>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>ML vs SGP4 benchmark</h2>
+          <div class="chart-box">
+            <canvas id="benchmark-chart"></canvas>
+          </div>
+          <p id="benchmark-note" class="note"></p>
+        </section>
+      </div>
+    </div>
+
+    <div class="right">
+      <section class="panel">
+        <h2>Conjunctions</h2>
+        <div id="conj-table"></div>
+      </section>
+      <section class="panel">
+        <h2>Selected event</h2>
+        <div id="event-panel">Click a conjunction to see details.</div>
+        <div id="maneuver"></div>
+      </section>
+      <section class="panel">
+        <h2>Collision alert</h2>
+        <pre id="alert-text" class="alert-text">Click a conjunction to see the alert.</pre>
+        <button id="copy-alert" class="btn">Copy alert</button>
+      </section>
+    </div>
+  </main>
+
+  <script src="vendor/chart.umd.min.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
