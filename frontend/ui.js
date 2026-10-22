@@ -7,7 +7,7 @@ function esc(value) {
     .replace(/"/g, "&quot;");
 }
 
-function badge(level) {
+export function badge(level) {
   return `<span class="badge ${esc(level)}">${esc(level)}</span>`;
 }
 
@@ -15,7 +15,7 @@ function demoTag(conj) {
   return conj.synthetic ? ' <span class="tag">DEMO / SYNTHETIC</span>' : "";
 }
 
-function formatPc(pc) {
+export function formatPc(pc) {
   return pc.toExponential(1);
 }
 
@@ -81,4 +81,18 @@ export function renderEvent(container, conj) {
       <dt>Relative speed</dt><dd>${conj.relative_speed_kms.toFixed(1)} km/s</dd>
       <dt>PoC</dt><dd>${formatPc(conj.pc)}</dd>
     </dl>`;
+}
+
+// Copies the alert text to the clipboard and confirms on the button
+export function setupCopy(button, textEl) {
+  const label = button.textContent;
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(textEl.textContent);
+      button.textContent = "Copied";
+    } catch (err) {
+      button.textContent = "Copy failed";
+    }
+    setTimeout(() => (button.textContent = label), 1500);
+  });
 }

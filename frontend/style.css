@@ -205,3 +205,109 @@ body {
   margin: 0;
   font-family: Consolas, monospace;
 }
+
+.bottom-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  height: 260px;
+}
+
+.bottom-row .panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-box {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.note {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #8fa3c0;
+}
+
+.right {
+  overflow-y: auto;
+}
+
+/* Panels keep their height, so the right column scrolls instead of squeezing them */
+.right > .panel {
+  flex-shrink: 0;
+}
+
+.burn {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #1d2d48;
+}
+
+.burn-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.burn-head strong {
+  font-family: Consolas, monospace;
+  font-size: 20px;
+}
+
+.burn-slider {
+  width: 100%;
+  margin: 4px 0 10px;
+}
+
+.burn-compare {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.burn-compare th,
+.burn-compare td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #1d2d48;
+  text-align: left;
+}
+
+.burn-compare th {
+  color: #7fb8ff;
+  font-weight: 600;
+}
+
+.burn-compare td:not(:first-child) {
+  font-family: Consolas, monospace;
+}
+
+.burn-actions {
+  margin: 10px 0 6px;
+}
+
+.burn-msg {
+  min-height: 1.4em;
+  margin: 0;
+  font-size: 16px;
+  color: #8fa3c0;
+}
+
+.burn-msg.error {
+  color: #ff8a8a;
+}
+
+.alert-text {
+  margin: 0 0 10px;
+  padding: 10px;
+  background: #05080f;
+  border: 1px solid #1d2d48;
+  border-radius: 6px;
+  font-family: Consolas, monospace;
+  font-size: 15px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
