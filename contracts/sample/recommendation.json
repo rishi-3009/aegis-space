@@ -1,0 +1,12 @@
+{
+  "conjunction_id": "c001",
+  "recommended_delta_v_ms": 0.05,
+  "direction": "prograde",
+  "new_miss_distance_km": 2.7,
+  "new_pc": 3.7e-10,
+  "new_risk_level": "LOW",
+  "candidates": [
+    {"delta_v_ms": 0.01, "new_miss_distance_km": 1.5, "new_pc": 8.9e-6, "new_risk_level": "MEDIUM"},
+    {"delta_v_ms": 0.05, "new_miss_distance_km": 2.7, "new_pc": 3.7e-10, "new_risk_level": "LOW"}
+  ]
+}

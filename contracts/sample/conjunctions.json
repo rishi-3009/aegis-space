@@ -1,0 +1,40 @@
+{
+  "conjunctions": [
+    {
+      "id": "c001",
+      "primary":   {"id": "25994", "name": "TERRA"},
+      "secondary": {"id": "34454", "name": "COSMOS 2251 DEB"},
+      "tca": "2026-10-23T04:12:30Z",
+      "tca_step": 972,
+      "miss_distance_km": 0.84,
+      "relative_speed_kms": 10.2,
+      "pc": 0.00019,
+      "risk_level": "HIGH",
+      "synthetic": false
+    },
+    {
+      "id": "c002",
+      "primary":   {"id": "27424", "name": "AQUA"},
+      "secondary": {"id": "35491", "name": "USA-226 DEB"},
+      "tca": "2026-10-23T08:45:15Z",
+      "tca_step": 1125,
+      "miss_distance_km": 8.5,
+      "relative_speed_kms": 9.8,
+      "pc": 1.2e-7,
+      "risk_level": "LOW",
+      "synthetic": false
+    },
+    {
+      "id": "c003",
+      "primary":   {"id": "39084", "name": "LANDSAT 8"},
+      "secondary": {"id": "DEMO-001", "name": "DEMO DEBRIS (SYNTHETIC)"},
+      "tca": "2026-10-23T14:22:00Z",
+      "tca_step": 1340,
+      "miss_distance_km": 0.62,
+      "relative_speed_kms": 10.5,
+      "pc": 0.00035,
+      "risk_level": "HIGH",
+      "synthetic": true
+    }
+  ]
+}
