@@ -12,6 +12,8 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -160,3 +162,12 @@ def get_report(conjunction_id: str):
         "conjunction_id": conjunction_id,
         "text": generate_report(_public(conj), recommend_burn(conj)),
     }
+
+
+# The dashboard is served by the same app, so one deployment covers page and API
+@app.get("/")
+def root():
+    return RedirectResponse(url="/frontend/")
+
+
+app.mount("/frontend", StaticFiles(directory=os.path.join(ROOT, "frontend"), html=True), name="frontend")

@@ -1,13 +1,7 @@
 {
-  "redirects": [
-    { "source": "/", "destination": "/frontend/", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index" }
-  ],
   "functions": {
-    "api/index.py": {
-      "includeFiles": "{data/**,ml/benchmark.json,contracts/sample/**}",
+    "index.py": {
+      "includeFiles": "{data/**,ml/benchmark.json,contracts/sample/**,frontend/**}",
       "maxDuration": 60
     }
   }
