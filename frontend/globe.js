@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "./vendor/OrbitControls.js";
+import { makeEarthMaterial, geoToScene } from "./earth.js";
 
 // Three.js scene: 1 unit = 1000 km
 const KM_PER_UNIT = 1000;
@@ -40,36 +41,43 @@ function makeLabel(text) {
 }
 
 export function createGlobe(container) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  // Transparent canvas, so the panel's blue gradient shows behind the Earth
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x05080f);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
   camera.position.set(0, 10, 26);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.minDistance = 8;
-  controls.maxDistance = 80;
+  // Panning would slide the Earth out of view, so only rotate and zoom
+  controls.enablePan = false;
 
   scene.add(new THREE.AmbientLight(0x404a5c));
   const sun = new THREE.DirectionalLight(0xffffff, 1.2);
   sun.position.set(10, 5, 10);
   scene.add(sun);
 
-  // Dark blue Earth with a lat/long grid drawn as a slightly larger wireframe
+  // Real Earth at night with city lights, and a thin atmosphere rim
   const earth = new THREE.Mesh(
-    new THREE.SphereGeometry(EARTH_RADIUS, 64, 48),
-    new THREE.MeshPhongMaterial({ color: 0x0c2a4d, shininess: 8 })
+    new THREE.SphereGeometry(EARTH_RADIUS, 96, 64),
+    makeEarthMaterial(renderer)
   );
-  const grid = new THREE.Mesh(
-    new THREE.SphereGeometry(EARTH_RADIUS * 1.002, 36, 18),
-    new THREE.MeshBasicMaterial({ color: 0x3a7bd5, wireframe: true, transparent: true, opacity: 0.25 })
+  const atmosphere = new THREE.Mesh(
+    new THREE.SphereGeometry(EARTH_RADIUS * 1.012, 64, 48),
+    new THREE.MeshBasicMaterial({
+      color: 0x6db4ff,
+      side: THREE.BackSide,
+      transparent: true,
+      opacity: 0.3,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
   );
-  scene.add(earth, grid);
+  scene.add(earth, atmosphere);
 
   // Every object's full track, by id, so any object can be looked up later
   const tracks = new Map();
@@ -101,6 +109,30 @@ export function createGlobe(container) {
 
   let focus = null;
   let currentF = 0;
+
+  // Distance from the Earth's centre at which the whole sphere just fits the panel,
+  // using the narrower of the two field-of-view axes
+  function fitDistance() {
+    const vfov = THREE.MathUtils.degToRad(camera.fov);
+    const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+    return (EARTH_RADIUS * 1.12) / Math.sin(Math.min(vfov, hfov) / 2);
+  }
+
+  // Keep the whole Earth in view. The camera's distance is measured from the
+  // orbit target, so the closest zoom is reduced by how far the target is from the centre.
+  let fitted = false;
+  function fitGlobe() {
+    const fit = fitDistance();
+    const offset = controls.target.length();
+    controls.minDistance = Math.max(fit - offset, 1);
+    controls.maxDistance = fit * 3;
+    // Start looking at Europe and Africa with the whole Earth filling the panel,
+    // then leave the user's zoom alone
+    if (!fitted) {
+      geoToScene(25, 25, fit * 1.05, camera.position);
+      fitted = true;
+    }
+  }
 
   // Keep the red line and threat zone on the moving objects
   function updateFocus() {
@@ -227,8 +259,11 @@ export function createGlobe(container) {
 
       const target = positionAt(tracks.get(primaryId), currentF, new THREE.Vector3());
       controls.target.copy(target);
-      const outward = target.clone().normalize().multiplyScalar(10);
-      camera.position.copy(target).add(outward);
+      // Camera sits outward from the primary, so the Earth still fills the view behind it
+      const outward = target.clone().normalize();
+      const distance = Math.max(fitDistance() * 1.05 - target.length(), 1);
+      camera.position.copy(target).addScaledVector(outward, distance);
+      fitGlobe();
     },
 
     clearFocus() {
@@ -250,6 +285,7 @@ export function createGlobe(container) {
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      fitGlobe();
     },
 
     render() {
