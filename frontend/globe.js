@@ -10,23 +10,31 @@ function eciToScene(x, y, z, target) {
   return target.set(x / KM_PER_UNIT, z / KM_PER_UNIT, -y / KM_PER_UNIT);
 }
 
+const LABEL_FONT = "bold 36px sans-serif";
+const LABEL_PX_PER_UNIT = 160;
+
+// Label is as wide as its text, so long object names are not cut off
 function makeLabel(text) {
+  const measure = document.createElement("canvas").getContext("2d");
+  measure.font = LABEL_FONT;
+  const width = Math.ceil(measure.measureText(text).width) + 16;
+
   const canvas = document.createElement("canvas");
-  canvas.width = 256;
+  canvas.width = width;
   canvas.height = 64;
   const ctx = canvas.getContext("2d");
-  ctx.font = "bold 36px sans-serif";
+  ctx.font = LABEL_FONT;
   ctx.fillStyle = "#cfefff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, 128, 32);
+  ctx.fillText(text, width / 2, 32);
   const material = new THREE.SpriteMaterial({
     map: new THREE.CanvasTexture(canvas),
     depthTest: false,
     transparent: true,
   });
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(1.6, 0.4, 1);
+  sprite.scale.set(width / LABEL_PX_PER_UNIT, 64 / LABEL_PX_PER_UNIT, 1);
   sprite.position.set(0, 0.45, 0);
   return sprite;
 }
@@ -99,7 +107,12 @@ export function createGlobe(container) {
     const primary = positionAt(tracks.get(focus.primaryId), currentF, tmpA);
     const secondary = positionAt(tracks.get(focus.secondaryId), currentF, tmpB);
     const pos = linkGeometry.attributes.position.array;
-    pos.set([primary.x, primary.y, primary.z, secondary.x, secondary.y, secondary.z]);
+    pos[0] = primary.x;
+    pos[1] = primary.y;
+    pos[2] = primary.z;
+    pos[3] = secondary.x;
+    pos[4] = secondary.y;
+    pos[5] = secondary.z;
     linkGeometry.attributes.position.needsUpdate = true;
     threat.position.copy(secondary);
   }
@@ -188,13 +201,15 @@ export function createGlobe(container) {
     // f is a fractional step index, e.g. 972.5
     setTime(f) {
       currentF = f;
+      // Plain loops, not forEach, so nothing is allocated per frame
       for (const group of groups) {
-        group.tracks.forEach((track, k) => {
-          positionAt(track, f, tmp);
+        const count = group.tracks.length;
+        for (let k = 0; k < count; k++) {
+          positionAt(group.tracks[k], f, tmp);
           group.positions[k * 3] = tmp.x;
           group.positions[k * 3 + 1] = tmp.y;
           group.positions[k * 3 + 2] = tmp.z;
-        });
+        }
         group.geometry.attributes.position.needsUpdate = true;
       }
       for (const { track, mesh } of primaries.values()) {

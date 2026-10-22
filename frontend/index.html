@@ -12,24 +12,39 @@
 </head>
 <body>
   <header class="title-bar">
-    <h1>AEGIS</h1>
-    <span id="status" class="status"></span>
+    <div class="brand">
+      <h1>AEGIS</h1>
+      <span class="tagline">Orbital Debris Watch</span>
+    </div>
+    <span id="status" class="status" data-state="loading">Loading data...</span>
   </header>
 
   <main class="layout">
     <div class="left">
       <section class="panel globe-panel">
         <div id="globe"></div>
+        <div class="hint">Drag to rotate · scroll to zoom</div>
+        <div class="legend">
+          <div><span class="dot primary"></span>Primary satellite</div>
+          <div><span class="dot sat"></span>Other satellite</div>
+          <div><span class="dot debris"></span>Debris</div>
+          <div><span class="line-key"></span>Closest pair</div>
+          <div><span class="dot threat"></span>Threat zone (not to scale)</div>
+        </div>
       </section>
       <div class="bottom-row">
         <section class="panel time-bar">
           <div class="time-controls">
-            <button id="play" class="btn">Pause</button>
-            <button class="btn speed" data-speed="1">1x</button>
-            <button class="btn speed" data-speed="60">60x</button>
-            <button class="btn speed" data-speed="600">600x</button>
-            <input id="scrubber" type="range" min="0" max="86340" step="1" value="0">
-            <span id="clock" class="clock">--</span>
+            <div class="transport">
+              <button id="play" class="btn primary">Pause</button>
+              <div class="speeds">
+                <button class="btn speed" data-speed="1">1x</button>
+                <button class="btn speed" data-speed="60">60x</button>
+                <button class="btn speed" data-speed="600">600x</button>
+              </div>
+              <span id="clock" class="clock">--</span>
+            </div>
+            <input id="scrubber" type="range" min="0" max="86340" step="1" value="0" aria-label="Time of day">
           </div>
         </section>
         <section class="panel">
@@ -49,13 +64,15 @@
       </section>
       <section class="panel">
         <h2>Selected event</h2>
-        <div id="event-panel">Click a conjunction to see details.</div>
+        <div id="event-panel" class="empty">Click a conjunction to see details.</div>
         <div id="maneuver"></div>
       </section>
       <section class="panel">
-        <h2>Collision alert</h2>
+        <div class="alert-head">
+          <h2>Collision alert</h2>
+          <button id="copy-alert" class="btn">Copy alert</button>
+        </div>
         <pre id="alert-text" class="alert-text">Click a conjunction to see the alert.</pre>
-        <button id="copy-alert" class="btn">Copy alert</button>
       </section>
     </div>
   </main>

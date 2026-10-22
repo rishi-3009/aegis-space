@@ -25,7 +25,7 @@ export function createManeuverPanel(container) {
         </tbody>
       </table>
       <div class="burn-actions">
-        <button id="apply-rec" class="btn">Apply recommended burn</button>
+        <button id="apply-rec" class="btn primary">Apply recommended burn</button>
       </div>
       <p id="burn-msg" class="burn-msg"></p>
     </div>`;

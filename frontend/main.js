@@ -31,6 +31,12 @@ let loaded = false;
 let selectedId = null;
 let setActiveRow = () => {};
 
+// state drives the colour of the status pill: loading, demo, live or error
+function setStatus(text, state) {
+  statusEl.textContent = text;
+  statusEl.dataset.state = state;
+}
+
 function setSpeed(value) {
   speed = value;
   speedButtons.forEach((btn) => btn.classList.toggle("active", Number(btn.dataset.speed) === value));
@@ -65,7 +71,7 @@ function selectConjunction(conj) {
 }
 
 async function init() {
-  statusEl.textContent = "Loading data...";
+  setStatus("Loading data...", "loading");
 
   // Benchmark loads separately, so a failure there does not stop the globe
   getJSON("benchmark")
@@ -90,9 +96,10 @@ async function init() {
     scrubber.max = totalSec;
     setActiveRow = renderConjunctionTable(tableEl, conjResp.conjunctions, selectConjunction);
     loaded = true;
-    statusEl.textContent = USE_SAMPLES ? "DEMO DATA (sample files)" : "Live backend";
+    if (USE_SAMPLES) setStatus("Demo data", "demo");
+    else setStatus("Live backend", "live");
   } catch (err) {
-    statusEl.textContent = "Could not load data: " + err.message;
+    setStatus("Could not load data: " + err.message, "error");
   }
 }
 
