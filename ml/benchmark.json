@@ -1,7 +1,25 @@
 {
-  "hours": [1, 6, 12, 24, 48],
-  "sgp4_error_km": [0.2, 0.9, 2.1, 5.0, 12.4],
-  "ml_error_km": [0.1, 0.5, 1.1, 2.4, 6.0],
-  "n_test_objects": 40,
+  "hours": [
+    1,
+    6,
+    12,
+    24,
+    48
+  ],
+  "sgp4_error_km": [
+    9585.255,
+    9109.625,
+    8926.373,
+    9300.702,
+    9542.218
+  ],
+  "ml_error_km": [
+    7373.939,
+    7356.626,
+    7079.748,
+    7151.43,
+    7355.525
+  ],
+  "n_test_objects": 45,
   "note": "Evaluated against a simulated reference orbit, not real radar tracks."
 }
