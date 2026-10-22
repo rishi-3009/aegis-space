@@ -1,9 +1,0 @@
-{
-  "conjunction_id": "c001",
-  "delta_v_ms": 0.05,
-  "direction": "prograde",
-  "burn_lead_hours": 6,
-  "new_miss_distance_km": 2.7,
-  "new_pc": 3.7e-10,
-  "new_risk_level": "LOW"
-}
