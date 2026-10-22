@@ -194,7 +194,7 @@ input {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--sec, var(--accent));
 }
 
 .panel h2::before {
@@ -202,7 +202,44 @@ input {
   width: 3px;
   height: 14px;
   border-radius: 2px;
-  background: var(--accent);
+  background: var(--sec, var(--accent));
+}
+
+/* Each section gets its own shade of blue: --panel-top/bottom is the fill,
+   --line the border, --sec the heading colour */
+.right > .panel:nth-child(1) {
+  --panel-top: #1d2f6b;
+  --panel-bottom: #121f4d;
+  --line: #34509f;
+  --sec: #9fb5ff;
+}
+
+.right > .panel:nth-child(2) {
+  --panel-top: #1b3d5e;
+  --panel-bottom: #11293f;
+  --line: #34668f;
+  --sec: #7fd0ff;
+}
+
+.right > .panel:nth-child(3) {
+  --panel-top: #123c84;
+  --panel-bottom: #0b2760;
+  --line: #2f64bd;
+  --sec: #8cc0ff;
+}
+
+.bottom-row > .panel:nth-child(1) {
+  --panel-top: #28235f;
+  --panel-bottom: #1a1647;
+  --line: #4a44a6;
+  --sec: #c0b6ff;
+}
+
+.bottom-row > .panel:nth-child(2) {
+  --panel-top: #0d4a6c;
+  --panel-bottom: #083352;
+  --line: #1f82ab;
+  --sec: #6fe3ff;
 }
 
 /* ---------- Globe ---------- */
@@ -212,7 +249,8 @@ input {
   padding: 0;
   position: relative;
   overflow: hidden;
-  background: #03060c;
+  background:
+    radial-gradient(ellipse at 50% 35%, #1f5cd6 0%, #0c2c86 42%, #04123a 80%, #020a24 100%);
 }
 
 #globe {

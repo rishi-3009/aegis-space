@@ -11,32 +11,41 @@ function eciToScene(x, y, z, target) {
   return target.set(x / KM_PER_UNIT, z / KM_PER_UNIT, -y / KM_PER_UNIT);
 }
 
-const LABEL_FONT = "bold 36px sans-serif";
-const LABEL_PX_PER_UNIT = 160;
+const LABEL_FONT = "bold 60px sans-serif";
+const LABEL_HEIGHT = 100;
+const LABEL_PX_PER_UNIT = 90;
 
-// Label is as wide as its text, so long object names are not cut off
-function makeLabel(text) {
+// Label is as wide as its text, so long object names are not cut off.
+// A dark rounded backing keeps the text readable over the bright city lights.
+function makeLabel(text, size = 1) {
   const measure = document.createElement("canvas").getContext("2d");
   measure.font = LABEL_FONT;
-  const width = Math.ceil(measure.measureText(text).width) + 16;
+  const width = Math.ceil(measure.measureText(text).width) + 48;
 
   const canvas = document.createElement("canvas");
   canvas.width = width;
-  canvas.height = 64;
+  canvas.height = LABEL_HEIGHT;
   const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(4, 10, 24, 0.78)";
+  ctx.strokeStyle = "rgba(51, 224, 255, 0.8)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(2, 2, width - 4, LABEL_HEIGHT - 4, 22);
+  ctx.fill();
+  ctx.stroke();
   ctx.font = LABEL_FONT;
-  ctx.fillStyle = "#cfefff";
+  ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, width / 2, 32);
+  ctx.fillText(text, width / 2, LABEL_HEIGHT / 2 + 3);
   const material = new THREE.SpriteMaterial({
     map: new THREE.CanvasTexture(canvas),
     depthTest: false,
     transparent: true,
   });
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(width / LABEL_PX_PER_UNIT, 64 / LABEL_PX_PER_UNIT, 1);
-  sprite.position.set(0, 0.45, 0);
+  sprite.scale.set((width / LABEL_PX_PER_UNIT) * size, (LABEL_HEIGHT / LABEL_PX_PER_UNIT) * size, 1);
+  sprite.position.set(0, 0.9, 0);
   return sprite;
 }
 
@@ -101,8 +110,8 @@ export function createGlobe(container) {
     new THREE.MeshBasicMaterial({ color: 0xff3b3b, transparent: true, opacity: 0.25, depthWrite: false })
   );
   // Label goes below the zone so it does not sit on top of the primary's label
-  const threatLabel = makeLabel("NOT TO SCALE");
-  threatLabel.position.y = -0.45;
+  const threatLabel = makeLabel("NOT TO SCALE", 0.4);
+  threatLabel.position.y = -0.6;
   threat.add(threatLabel);
   threat.visible = false;
   scene.add(threat);
