@@ -7,11 +7,11 @@ import json
 import os
 import sys
 import time
-from contextlib import asynccontextmanager
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -41,6 +41,7 @@ def _public(conj):
 
 
 def _find(conjunction_id):
+    _ensure_state()
     conj = STATE["conjunctions_by_id"].get(conjunction_id)
     if conj is None:
         raise HTTPException(status_code=404, detail=f"Conjunction not found: {conjunction_id}")
@@ -65,36 +66,40 @@ def _tracked_indices(objects, conjunctions):
     return tracked
 
 
-@asynccontextmanager
-async def lifespan(app):
+def _ensure_state():
+    """Compute everything once, on first use. Serverless hosts (Vercel) do not run startup hooks."""
+    if STATE:
+        return
     t0 = time.perf_counter()
     start = default_start()
     objects, pos, vel = propagate_all(start)
     objects, pos, vel, conjunctions = build_conjunctions(objects, pos, vel, start)
 
     tracked = _tracked_indices(objects, conjunctions)
-    STATE["start"] = start
-    STATE["objects"] = objects
-    STATE["conjunctions"] = conjunctions
-    STATE["conjunctions_by_id"] = {c["id"]: c for c in conjunctions}
-    STATE["tracked"] = tracked
     # float64 before rounding, otherwise float32 digits bloat the JSON
     trajectories = {
         objects[i]["id"]: np.round(pos[i].astype(np.float64), 1).tolist() for i in tracked
     }
-    # Encode once here; encoding ~200 x 1440 points per request is too slow for the 1 s limit
-    STATE["trajectories_json"] = json.dumps({
+    # Encode once; encoding ~200 x 1440 points per request is too slow for the 1 s limit
+    trajectories_json = json.dumps({
         "start": start.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "step_seconds": 60,
         "steps": pos.shape[1],
         "objects": trajectories,
     }, separators=(",", ":")).encode("utf-8")
-    print(f"startup: {len(objects)} objects, {len(conjunctions)} conjunctions, "
+
+    STATE["start"] = start
+    STATE["objects"] = objects
+    STATE["conjunctions"] = conjunctions
+    STATE["conjunctions_by_id"] = {c["id"]: c for c in conjunctions}
+    STATE["tracked"] = tracked
+    STATE["trajectories_json"] = trajectories_json
+    print(f"state: {len(objects)} objects, {len(conjunctions)} conjunctions, "
           f"{len(tracked)} tracked, {time.perf_counter() - t0:.1f}s")
-    yield
 
 
-app = FastAPI(title="Aegis Space: ST-01 Space Debris Tracking", lifespan=lifespan)
+app = FastAPI(title="Aegis Space: ST-01 Space Debris Tracking")
+app.add_middleware(GZipMiddleware, minimum_size=500)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -105,6 +110,7 @@ app.add_middleware(
 
 @app.get("/api/objects")
 def get_objects():
+    _ensure_state()
     objects = STATE["objects"]
     return {"objects": [
         {
@@ -119,11 +125,13 @@ def get_objects():
 
 @app.get("/api/trajectories")
 def get_trajectories():
+    _ensure_state()
     return Response(content=STATE["trajectories_json"], media_type="application/json")
 
 
 @app.get("/api/conjunctions")
 def get_conjunctions():
+    _ensure_state()
     return {"conjunctions": [_public(c) for c in STATE["conjunctions"]]}
 
 
