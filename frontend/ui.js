@@ -75,12 +75,12 @@ export function renderEvent(container, conj) {
     <div class="event-title">
       ${esc(conj.primary.name)} vs ${esc(conj.secondary.name)} ${badge(conj.risk_level)}${demoTag(conj)}
     </div>
-    <dl class="event-grid">
-      <dt>TCA (UTC)</dt><dd>${esc(formatTca(conj.tca))}</dd>
-      <dt>Miss distance</dt><dd>${conj.miss_distance_km.toFixed(2)} km</dd>
-      <dt>Relative speed</dt><dd>${conj.relative_speed_kms.toFixed(1)} km/s</dd>
-      <dt>PoC</dt><dd>${formatPc(conj.pc)}</dd>
-    </dl>`;
+    <div class="metrics">
+      <div class="metric"><span>TCA (UTC)</span><strong>${esc(formatTca(conj.tca))}</strong></div>
+      <div class="metric"><span>Miss distance</span><strong>${conj.miss_distance_km.toFixed(2)} km</strong></div>
+      <div class="metric"><span>Relative speed</span><strong>${conj.relative_speed_kms.toFixed(1)} km/s</strong></div>
+      <div class="metric"><span>PoC</span><strong>${formatPc(conj.pc)}</strong></div>
+    </div>`;
 }
 
 // Copies the alert text to the clipboard and confirms on the button

@@ -15,7 +15,13 @@ async function fetchJSON(url, options) {
   try {
     res = await fetch(url, options);
   } catch (err) {
-    throw new Error(`Could not reach ${url}`);
+    if (USE_SAMPLES) {
+      throw new Error(`Sample file missing: ${url}`);
+    }
+    throw new Error(
+      `Backend not reachable at ${API_BASE}. Start it from the repo root with: ` +
+        "uvicorn backend.main:app --reload --port 8000"
+    );
   }
   if (!res.ok) {
     let detail = `HTTP ${res.status}`;
